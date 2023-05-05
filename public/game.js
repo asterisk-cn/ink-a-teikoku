@@ -1,123 +1,98 @@
 "use strict";
 
-const config = {
-    type: Phaser.AUTO,
-    width: 800,
-    height: 600,
-    physics: {
-        default: "arcade",
-    },
-    scene: {
-        create: create,
-    },
-};
-
 const socket = io();
 
-const game = new Phaser.Game(config);
-let circles = {};
-let rects = [];
-let canClick = true;
-let graphics;
-let winner = null;
-let isGameStarted = false;
-let isGameOver = false;
+const canvas = document.getElementById("canvas");
+canvas.width = SharedSettings.FIELD_WIDTH;
+canvas.height = SharedSettings.FIELD_HEIGHT;
 
-function create() {
-    graphics = this.add.graphics();
-    graphics.fillStyle(0xaaaaaa, 1);
+const showResultButton = document.getElementById("showResultButton");
+const resetButton = document.getElementById("resetButton");
 
-    // //障害物
-    // graphics.fillRect(100, 200, 200, 200);
-    // rects.push(new Phaser.Geom.Rectangle(100, 200, 200, 200));
+const context = canvas.getContext("2d");
 
-    this.input.on("pointerdown", function (pointer) {
-        if (canClick) {
-            socket.emit("position", { x: pointer.x, y: pointer.y });
-            canClick = false; // クリック無効化
-        }
-    });
+let canClick = false;
 
-    socket.on("positions", function (positions) {
-        for (let id in positions) {
-            const position = positions[id];
-            const circle = new Phaser.Geom.Circle(position.x, position.y, 0);
-            circle.frozen = false;
-            circles[id] = circle;
-        }
-        startGame();
-    });
-}
+socket.on("init", function (gameState) {
+    const obstacles = gameState.obstacles;
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    for (let id in obstacles) {
+        const obstacle = obstacles[id];
+        context.fillStyle = obstacle.color;
+        context.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+    }
+    canClick = true;
+});
 
-let animation;
+canvas.addEventListener("mousedown", function (e) {
+    if (!canClick) {
+        return;
+    }
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    socket.emit("selectPoint", { x: x, y: y });
+});
 
-function startGame() {
-    animation = setInterval(update, 10);
-}
+socket.on("renderSelect", function (gameState, failure) {
+    const players = gameState.players;
+    const obstacles = gameState.obstacles;
+    context.clearRect(0, 0, canvas.width, canvas.height);
 
-function update() {
-    for (let id in circles) {
-        const circle = circles[id];
-        if (circle.frozen) {
-            continue;
-        }
-
-        circle.radius += 2;
-
-        // 画面外に出たら止める
-        let check_left = circle.x - circle.radius < 0;
-        let check_right = circle.x + circle.radius > config["width"];
-        let check_top = circle.y - circle.radius < 0;
-        let check_bottom = circle.y + circle.radius > config["height"];
-        if (check_left || check_right || check_top || check_bottom) {
-            circle.frozen = true;
-        }
-
-        // 他の円と衝突したら止める
-        for (let j in circles) {
-            if (id == j) {
-                continue;
-            }
-            const _circle = circles[j];
-            if (Phaser.Geom.Intersects.CircleToCircle(circle, _circle)) {
-                circle.frozen = true;
-                _circle.frozen = true;
-            }
-        }
-
-        // 障害物と衝突したら止める
-        for (let i = 0; i < rects.length; i++) {
-            const rect = rects[i];
-            if (Phaser.Geom.Intersects.CircleToRectangle(circle, rect)) {
-                circle.frozen = true;
-            }
-        }
-
-        if (!circle.frozen) {
-            winner = id;
-            graphics.fillCircleShape(circle);
-        }
+    for (let id in obstacles) {
+        const obstacle = obstacles[id];
+        context.fillStyle = obstacle.color;
+        context.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
     }
 
-    // ゲーム終了判定
-    let count = 0;
-    for (let id in circles) {
-        const circle = circles[id];
-        if (circle.frozen) {
-            count++;
-        }
+    const player = players[socket.id];
+    context.fillStyle = player.color;
+    context.beginPath();
+    context.arc(player.x, player.y, 5, 0, 2 * Math.PI);
+    context.fill();
+
+    if (failure) {
+        alert("Colliding with an obstacle!");
     }
-    if (count == Object.keys(circles).length) {
-        isGameOver = true;
+});
+
+showResultButton.addEventListener("click", function () {
+    canClick = false;
+    socket.emit("showResult");
+});
+
+resetButton.addEventListener("click", function () {
+    socket.emit("reset");
+});
+
+socket.on("renderGame", function (gameState) {
+    render(gameState);
+});
+
+function render(gameState) {
+    const players = gameState.players;
+    const obstacles = gameState.obstacles;
+    context.clearRect(0, 0, canvas.width, canvas.height);
+
+    for (let id in obstacles) {
+        const obstacle = obstacles[id];
+        context.fillStyle = obstacle.color;
+        context.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
     }
 
-    if (isGameOver) {
-        console.log("Winner: " + winner);
-        if (winner == socket.id) {
-            alert("You Win!");
-        } else {
-            alert("You Lose...");
-        }
-        clearInterval(animation);
+    for (let id in players) {
+        const player = players[id];
+        const name = player.name;
+        const fontSize = player.radius / 2;
+
+        context.fillStyle = player.color;
+        context.beginPath();
+        context.arc(player.x, player.y, player.radius, 0, 2 * Math.PI);
+        context.fill();
+
+        context.fillStyle = "#333333";
+        context.font = fontSize + "px sans-serif";
+        context.textAlign = "center";
+        context.fillText(name, player.x, player.y + fontSize / 3);
     }
 }

@@ -5,11 +5,15 @@
         <title>Expanding Circle</title>
     </head>
     <body>
-        <!-- <canvas id="canvas" width="800" height="600" style="margin-bottom: 10px; border: 3px solid #333333"></canvas> -->
-        <div id="game-container"></div>
+        <div>
+            <button id="showResultButton">Show Result</button>
+            <button id="resetButton">Reset</button>
+        </div>
+        <canvas id="canvas" style="margin-bottom: 10px; border: 3px solid #333333"></canvas>
         <script src="/socket.io/socket.io.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.min.js"></script>
+        <script src="sharedSettings.js"></script>
         <script src="game.js"></script>
     </body>
 </html>
