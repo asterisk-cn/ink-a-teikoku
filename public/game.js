@@ -1,3 +1,5 @@
+"use strict";
+
 const config = {
     type: Phaser.AUTO,
     width: 800,
@@ -6,9 +8,7 @@ const config = {
         default: "arcade",
     },
     scene: {
-        preload: preload,
         create: create,
-        update: update,
     },
 };
 
@@ -19,13 +19,15 @@ let circles = {};
 let rects = [];
 let canClick = true;
 let graphics;
-let stop = {};
-
-function preload() {}
+let winner = null;
+let isGameStarted = false;
+let isGameOver = false;
 
 function create() {
     graphics = this.add.graphics();
     graphics.fillStyle(0xaaaaaa, 1);
+
+    // //障害物
     // graphics.fillRect(100, 200, 200, 200);
     // rects.push(new Phaser.Geom.Rectangle(100, 200, 200, 200));
 
@@ -38,12 +40,19 @@ function create() {
 
     socket.on("positions", function (positions) {
         for (let id in positions) {
-            position = positions[id];
+            const position = positions[id];
             const circle = new Phaser.Geom.Circle(position.x, position.y, 0);
             circle.frozen = false;
             circles[id] = circle;
         }
+        startGame();
     });
+}
+
+let animation;
+
+function startGame() {
+    animation = setInterval(update, 10);
 }
 
 function update() {
@@ -52,6 +61,8 @@ function update() {
         if (circle.frozen) {
             continue;
         }
+
+        circle.radius += 2;
 
         // 画面外に出たら止める
         let check_left = circle.x - circle.radius < 0;
@@ -71,7 +82,6 @@ function update() {
             if (Phaser.Geom.Intersects.CircleToCircle(circle, _circle)) {
                 circle.frozen = true;
                 _circle.frozen = true;
-                break;
             }
         }
 
@@ -80,22 +90,34 @@ function update() {
             const rect = rects[i];
             if (Phaser.Geom.Intersects.CircleToRectangle(circle, rect)) {
                 circle.frozen = true;
-                break;
             }
         }
-        circle.radius += 2;
-        graphics.fillCircleShape(circle);
+
+        if (!circle.frozen) {
+            winner = id;
+            graphics.fillCircleShape(circle);
+        }
+    }
+
+    // ゲーム終了判定
+    let count = 0;
+    for (let id in circles) {
+        const circle = circles[id];
+        if (circle.frozen) {
+            count++;
+        }
+    }
+    if (count == Object.keys(circles).length) {
+        isGameOver = true;
+    }
+
+    if (isGameOver) {
+        console.log("Winner: " + winner);
+        if (winner == socket.id) {
+            alert("You Win!");
+        } else {
+            alert("You Lose...");
+        }
+        clearInterval(animation);
     }
 }
-
-// // 座標を受信して円を表示する
-// socket.on("positions", function (positions) {
-//     startTime = Date.now();
-//     // 円を描画する
-//     graphics.lineStyle(2, 0xffffff);
-//     Object.values(positions).forEach(function (position) {
-//         // 円の半径を徐々に増加させる
-//         const radius = (Math.min(Date.now() - startTime, 1000) / 1000) * 50;
-//         graphics.strokeCircle(position.x, position.y, radius);
-//     });
-// });
