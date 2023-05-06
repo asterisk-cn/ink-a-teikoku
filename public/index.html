@@ -11,6 +11,65 @@
         <title>Ink-a-Teikoku</title>
     </head>
     <body>
+        <div
+            class="modal fade"
+            id="modeSelectModal"
+            tabindex="-1"
+            data-bs-backdrop="static"
+            data-bs-keyboard="false"
+            aria-labelledby="exampleModalLabel"
+            aria-hidden="true"
+        >
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header justify-content-center">
+                        <h5 class="modal-title" id="exampleModalLabel">Welcome!</h5>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row text-center justify-content-center mb-2">
+                            <div class="row justify-content-center">
+                                <p class="m-2">Battle with other player</p>
+                                <div class="row">
+                                    <div class="input-group mb-3">
+                                        <input
+                                            type="text"
+                                            class="form-control text-center"
+                                            placeholder="Room ID"
+                                            aria-label="Room ID"
+                                            aria-describedby="basic-addon2"
+                                            id="roomIDInput"
+                                        />
+                                        <button
+                                            type="button"
+                                            class="btn btn-primary"
+                                            data-bs-dismiss="modal"
+                                            id="joinButton"
+                                        >
+                                            Join
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row justify-content-center">
+                                <div class="row justify-content-center">
+                                    <p class="m-2">or</p>
+                                </div>
+                                <div class="m-3">
+                                    <button
+                                        type="button"
+                                        class="btn btn-secondary"
+                                        data-bs-dismiss="modal"
+                                        id="hostButton"
+                                    >
+                                        Battle with cpu
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="container">
             <h1>Ink-a-Teikoku</h1>
             <div class="text-end p-2">

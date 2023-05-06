@@ -13,6 +13,10 @@ const context = canvas.getContext("2d");
 
 let canClick = false;
 
+$(window).on("load", function () {
+    $("#modeSelectModal").modal("show");
+});
+
 socket.on("init", function (gameState) {
     const obstacles = gameState.obstacles;
     context.clearRect(0, 0, canvas.width, canvas.height);
