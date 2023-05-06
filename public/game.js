@@ -29,8 +29,15 @@ canvas.addEventListener("mousedown", function (e) {
         return;
     }
     const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const x = ((e.clientX - rect.left) / rect.width) * canvas.width;
+    const y = ((e.clientY - rect.top) / rect.height) * canvas.height;
+    console.log("x: " + x + ", y: " + y);
+    console.log("rect.left: " + rect.left + ", rect.top: " + rect.top);
+    console.log("rect.right: " + rect.right + ", rect.bottom: " + rect.bottom);
+    console.log("e.clientX: " + e.clientX + ", e.clientY: " + e.clientY);
+    console.log("canvas.width: " + canvas.width + ", canvas.height: " + canvas.height);
+    console.log(rect);
+
     socket.emit("selectPoint", { x: x, y: y });
 });
 
