@@ -17,36 +17,39 @@
             tabindex="-1"
             data-bs-backdrop="static"
             data-bs-keyboard="false"
-            aria-labelledby="exampleModalLabel"
+            aria-labelledby="modeSelectModalLabel"
             aria-hidden="true"
         >
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-header justify-content-center">
-                        <h5 class="modal-title" id="exampleModalLabel">Welcome!</h5>
+                        <h5 class="modal-title">Welcome!</h5>
                     </div>
                     <div class="modal-body">
                         <div class="row text-center justify-content-center mb-2">
                             <div class="row justify-content-center">
-                                <p class="m-2">Battle with other player</p>
-                                <div class="row">
+                                <p class="m-2 fw-bolder">Battle against players</p>
+                                <div class="row needs-validation" novalidate>
                                     <div class="input-group mb-3">
+                                        <input
+                                            type="text"
+                                            class="form-control text-center"
+                                            placeholder="Your name"
+                                            aria-label="Your name"
+                                            aria-describedby="basic-addon2"
+                                            id="nameInput"
+                                        />
+                                        <span class="input-group-text">@</span>
                                         <input
                                             type="text"
                                             class="form-control text-center"
                                             placeholder="Room ID"
                                             aria-label="Room ID"
                                             aria-describedby="basic-addon2"
-                                            id="roomIDInput"
+                                            id="roomIdInput"
                                         />
-                                        <button
-                                            type="button"
-                                            class="btn btn-primary"
-                                            data-bs-dismiss="modal"
-                                            id="joinButton"
-                                        >
-                                            Join
-                                        </button>
+                                        <button type="button" class="btn btn-primary" id="joinButton">Join</button>
+                                        <div class="invalid-feedback">Please enter your name and room ID.</div>
                                     </div>
                                 </div>
                             </div>
@@ -59,9 +62,9 @@
                                         type="button"
                                         class="btn btn-secondary"
                                         data-bs-dismiss="modal"
-                                        id="hostButton"
+                                        id="vsComputerButton"
                                     >
-                                        Battle with cpu
+                                        Battle against cpu
                                     </button>
                                 </div>
                             </div>
