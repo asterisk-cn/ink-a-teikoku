@@ -1,10 +1,14 @@
 "use strict";
 
+import SharedSettings from "./sharedSettings.js";
+const FIELD_WIDTH = SharedSettings.FIELD_WIDTH;
+const FIELD_HEIGHT = SharedSettings.FIELD_HEIGHT;
+
 const socket = io();
 
 const canvas = document.getElementById("canvas");
-canvas.width = SharedSettings.FIELD_WIDTH;
-canvas.height = SharedSettings.FIELD_HEIGHT;
+canvas.width = FIELD_WIDTH;
+canvas.height = FIELD_HEIGHT;
 
 const showResultButton = document.getElementById("showResultButton");
 const resetButton = document.getElementById("resetButton");
@@ -35,12 +39,6 @@ canvas.addEventListener("mousedown", function (e) {
     const rect = canvas.getBoundingClientRect();
     const x = ((e.clientX - rect.left) / rect.width) * canvas.width;
     const y = ((e.clientY - rect.top) / rect.height) * canvas.height;
-    console.log("x: " + x + ", y: " + y);
-    console.log("rect.left: " + rect.left + ", rect.top: " + rect.top);
-    console.log("rect.right: " + rect.right + ", rect.bottom: " + rect.bottom);
-    console.log("e.clientX: " + e.clientX + ", e.clientY: " + e.clientY);
-    console.log("canvas.width: " + canvas.width + ", canvas.height: " + canvas.height);
-    console.log(rect);
 
     socket.emit("selectPoint", { x: x, y: y });
 });

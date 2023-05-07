@@ -1,23 +1,23 @@
 "use strict";
 
-const http = require("http");
-const express = require("express");
-const path = require("path");
-const socketIO = require("socket.io");
-const sat = require("sat");
-const nanoId = require("nanoid");
+import express from "express";
+import http from "http";
+import { nanoid } from "nanoid";
+import path from "path";
+import sat from "sat";
+import { Server } from "socket.io";
 
 const app = express();
-const server = http.Server(app);
-const io = socketIO(server);
+const server = http.createServer(app);
+const io = new Server(server);
 
-const sharedSettings = require("./public/sharedSettings");
-const FIELD_WIDTH = sharedSettings.FIELD_WIDTH;
-const FIELD_HEIGHT = sharedSettings.FIELD_HEIGHT;
+import SharedSettings from "./public/sharedSettings.js";
+const FIELD_WIDTH = SharedSettings.FIELD_WIDTH;
+const FIELD_HEIGHT = SharedSettings.FIELD_HEIGHT;
 
 class GameObject {
     constructor(obj = {}) {
-        this.id = nanoId.nanoid();
+        this.id = nanoid();
         this.x = obj.x;
         this.y = obj.y;
         this.color = obj.color;
