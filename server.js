@@ -126,7 +126,8 @@ class Game {
         this.players = {};
         this.obstacles = {};
         this.status = {
-            winner: null,
+            winners: [],
+            isTie: false,
         };
 
         this.setRandomObstacles(3);
@@ -144,10 +145,24 @@ class Game {
         return this.alivePlayers.length === 0;
     }
 
+    get numReadyActualPlayers() {
+        return Object.values(this.players).filter((player) => player.isReady && !player.isBot).length;
+    }
+
+    get numActualPlayers() {
+        return Object.values(this.players).filter((player) => !player.isBot).length;
+    }
+
     checkWinner() {
         const alivePlayers = this.alivePlayers;
+        if (alivePlayers.length === 0) {
+            return;
+        }
+        this.status.winners = alivePlayers;
         if (alivePlayers.length === 1) {
-            this.status.winner = alivePlayers[0];
+            this.status.isTie = false;
+        } else if (alivePlayers.length > 1) {
+            this.status.isTie = true;
         }
     }
 
@@ -168,7 +183,8 @@ class Game {
                 player.setRandom(this);
             }
         }
-        this.status.winner = null;
+        this.status.winners = [];
+        this.status.isTie = false;
     }
 
     isEmpty() {
@@ -252,6 +268,9 @@ io.on("connection", (socket) => {
         socket.join(player.roomId);
 
         socket.emit("init", game);
+        io.in(player.roomId).emit("readyPlayers", game.numReadyActualPlayers, game.numActualPlayers);
+
+        console.log(`Player ${player.name} joined room ${player.roomId}`);
     });
 
     socket.on("selectPoint", (p) => {
@@ -272,6 +291,7 @@ io.on("connection", (socket) => {
         }
 
         socket.emit("renderSelect", game, isValidate);
+        io.in(user.roomId).emit("readyPlayers", game.numReadyActualPlayers, game.numActualPlayers);
     });
 
     socket.on("showResult", () => {

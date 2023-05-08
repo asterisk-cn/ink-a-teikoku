@@ -48,18 +48,21 @@ $("#joinButton").on("click", function () {
     const roomId = roomIdInput.value;
     const name = nameInput.value;
     $("#modeSelectModal").modal("hide");
+    $("#roomId").text(roomId);
     socket.emit("join", { roomId: roomId, name: name });
 });
 
 $("#vsComputerButton").on("click", function () {
     $("#modeSelectModal").modal("hide");
+    $("#roomId").text("Computer");
     socket.emit("join", { roomId: null, name: "You" });
 });
 
-socket.on("init", function (gameState) {
-    const obstacles = gameState.obstacles;
+socket.on("init", function (game) {
+    const obstacles = game.obstacles;
     context.clearRect(0, 0, canvas.width, canvas.height);
     renderObstacles(obstacles);
+
     canClick = true;
 });
 
@@ -74,9 +77,34 @@ $("#canvas").on("click", function (e) {
     socket.emit("selectPoint", { x: x, y: y });
 });
 
-socket.on("renderSelect", function (gameState, isValidate) {
-    const player = gameState.players[socket.id];
-    const obstacles = gameState.obstacles;
+socket.on("readyPlayers", function (numReadyPlayers, numPlayers) {
+    console.log(`Ready players: ${numReadyPlayers} / ${numPlayers}`);
+    $("#readyPlayers").text(`${numReadyPlayers} / ${numPlayers}`);
+});
+
+socket.on("gameOver", function (game) {
+    const winners = game.status.winners;
+    const isWin = winners.some((winner) => {
+        return winner.socketId === socket.id;
+    });
+    if (isWin) {
+        $("#result").text("win!");
+    } else {
+        $("#result").text("lose...");
+    }
+
+    const text = winners
+        .map((winner) => {
+            return winner.name;
+        })
+        .join(", ");
+    $("#winner").text(text);
+    $("#resultModal").modal("show");
+});
+
+socket.on("renderSelect", function (game, isValidate) {
+    const player = game.players[socket.id];
+    const obstacles = game.obstacles;
     context.clearRect(0, 0, canvas.width, canvas.height);
 
     renderObstacles(obstacles);
@@ -88,8 +116,8 @@ socket.on("renderSelect", function (gameState, isValidate) {
     }
 });
 
-socket.on("renderGame", function (gameState) {
-    renderAll(gameState);
+socket.on("renderGame", function (game) {
+    renderAll(game);
 });
 
 function renderObstacles(obstacles) {
@@ -129,9 +157,9 @@ function renderPlayers(players) {
     }
 }
 
-function renderAll(gameState) {
-    const players = gameState.players;
-    const obstacles = gameState.obstacles;
+function renderAll(game) {
+    const players = game.players;
+    const obstacles = game.obstacles;
     context.clearRect(0, 0, canvas.width, canvas.height);
 
     renderObstacles(obstacles);

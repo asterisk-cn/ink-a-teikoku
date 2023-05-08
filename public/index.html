@@ -9,6 +9,25 @@
             crossorigin="anonymous"
         />
         <title>Ink-a-Teikoku</title>
+        <style>
+            @media (min-width: 576px) {
+                .container {
+                    max-width: 570px;
+                }
+            }
+
+            @media (min-width: 768px) {
+                .container {
+                    max-width: 760px;
+                }
+            }
+
+            @media (min-width: 992px) {
+                .container {
+                    max-width: 850px;
+                }
+            }
+        </style>
     </head>
     <body>
         <div
@@ -73,14 +92,62 @@
                 </div>
             </div>
         </div>
-        <div class="container">
+        <div
+            class="modal fade"
+            id="resultModal"
+            tabindex="-1"
+            role="dialog"
+            aria-labelledby="resultModalTitle"
+            aria-hidden="true"
+        >
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="resultModalTitle">
+                            You&nbsp;
+                            <span id="result">Win!</span>
+                        </h5>
+                        <button
+                            type="button"
+                            class="close border border-0 bg-white"
+                            data-bs-dismiss="modal"
+                            aria-label="Close"
+                        >
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body h3 d-flex justify-content-center align-items-end">
+                        <img src="./images/icons8-crown-50.png" alt="crown" />
+                        <span id="winner"></span>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container max-width-200">
             <h1>Ink-a-Teikoku</h1>
-            <div class="text-end p-2">
-                <button type="button" class="btn btn-primary m-2" id="showResultButton">Start</button>
-                <button type="button" class="btn btn-secondary m-2" id="resetButton">Reset</button>
+            <div class="d-flex justify-content-between align-items-end">
+                <p class="m-2">
+                    <img src="./images/house-fill.svg" alt="house" />
+                    <span id="roomId"></span>
+                </p>
+                <div class="m-2">
+                    <button type="button" class="btn btn-primary m-2" id="showResultButton">Start</button>
+                    <button type="button" class="btn btn-secondary m-2" id="resetButton">Reset</button>
+                    <div class="row justify-content-center text-center">
+                        <div id="roomInfo" class="d-inline-block">
+                            <p class="m-2 d-inline-block">
+                                <img src="./images/person-check-fill.svg" alt="person" />
+                                <span id="readyPlayers">0 / 0</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="row justify-content-center">
-                <canvas id="canvas" class="p-0 m-3" style="border: 3px solid #333333"></canvas>
+                <canvas id="canvas" class="p-0" style="border: 3px solid #333333"></canvas>
             </div>
         </div>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
