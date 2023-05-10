@@ -232,8 +232,27 @@ class Game {
 const rooms = {};
 const users = [];
 
+function validateUser(socket) {
+    const isValid = users.some((user) => user.socketId === socket.id);
+    if (!isValid) {
+        console.log("user " + socket.id + " is not valid");
+        socket.emit("init");
+    }
+    return isValid;
+}
+
+function validateRoom(socket, roomId) {
+    const isValid = Object.keys(rooms).includes(roomId);
+    if (!isValid) {
+        console.log("room " + roomId + " is not valid");
+        socket.emit("init");
+    }
+    return isValid;
+}
+
 io.on("connection", (socket) => {
-    console.log("a user connected");
+    console.log(socket.id + " connected");
+    socket.emit("init");
 
     socket.on("join", (playerData) => {
         const player = new Player({
@@ -267,14 +286,20 @@ io.on("connection", (socket) => {
 
         socket.join(player.roomId);
 
-        socket.emit("init", game);
+        socket.emit("initGame", game);
         io.in(player.roomId).emit("readyPlayers", game.numReadyActualPlayers, game.numActualPlayers);
 
         console.log(`Player ${player.name} joined room ${player.roomId}`);
     });
 
     socket.on("selectPoint", (p) => {
+        if (!validateUser(socket)) {
+            return;
+        }
         const user = users.find((u) => u.socketId === socket.id);
+        if (!validateRoom(socket, user.roomId)) {
+            return;
+        }
         const game = rooms[user.roomId];
         const player = game.players[socket.id];
         if (player) {
@@ -295,32 +320,41 @@ io.on("connection", (socket) => {
     });
 
     socket.on("showResult", () => {
+        if (!validateUser(socket)) {
+            return;
+        }
         const user = users.find((u) => u.socketId === socket.id);
+        if (!validateRoom(socket, user.roomId)) {
+            return;
+        }
         const game = rooms[user.roomId];
         game.showResult();
     });
 
     socket.on("reset", () => {
+        if (!validateUser(socket)) {
+            return;
+        }
         const user = users.find((u) => u.socketId === socket.id);
+        if (!validateRoom(socket, user.roomId)) {
+            return;
+        }
         const game = rooms[user.roomId];
         game.reset();
-        io.in(user.roomId).emit("init", game);
+        io.in(user.roomId).emit("initGame", game);
         io.in(user.roomId).emit("readyPlayers", game.numReadyActualPlayers, game.numActualPlayers);
     });
 
     socket.on("disconnect", () => {
-        console.log("user disconnected");
+        console.log(socket.id + " disconnected");
+        if (!validateUser(socket)) {
+            return;
+        }
         const user = users.find((u) => u.socketId === socket.id);
-        if (!user) {
-            console.log("user not found");
+        if (!validateRoom(socket, user.roomId)) {
             return;
         }
-
         const game = rooms[user.roomId];
-        if (!game) {
-            console.log("game not found");
-            return;
-        }
 
         delete game.players[socket.id];
         if (game.isEmpty()) {

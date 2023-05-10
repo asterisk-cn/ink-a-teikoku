@@ -58,7 +58,20 @@ $("#vsComputerButton").on("click", function () {
     socket.emit("join", { roomId: null, name: "You" });
 });
 
-socket.on("init", function (game) {
+socket.on("init", function () {
+    $("#readyPlayers").text("0 / 0");
+    $("#modeSelectModal").modal("show");
+    $("#resultModal").modal("hide");
+    $("#result").text("");
+    $("#winner").text("");
+    $("#roomId").text("");
+    $("#roomIdInput").val("");
+    $("#nameInput").val("");
+    $("#roomIdInput").removeClass("is-invalid");
+    $("#nameInput").removeClass("is-invalid");
+});
+
+socket.on("initGame", function (game) {
     const obstacles = game.obstacles;
     context.clearRect(0, 0, canvas.width, canvas.height);
     renderObstacles(obstacles);
