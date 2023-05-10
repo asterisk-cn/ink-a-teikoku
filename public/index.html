@@ -31,6 +31,34 @@
         </style>
     </head>
     <body>
+        <div class="container max-width-200">
+            <div class="text-center">
+                <img src="./images/inkateikoku.png" />
+            </div>
+            <div class="d-flex justify-content-between align-items-end">
+                <p class="m-2">
+                    <img src="./images/house-fill.svg" alt="house" />
+                    <span id="roomId"></span>
+                </p>
+                <div class="m-2">
+                    <button type="button" class="btn btn-primary m-2" id="showResultButton">Start</button>
+                    <button type="button" class="btn btn-secondary m-2" id="resetButton">Reset</button>
+                    <div class="row justify-content-center text-center">
+                        <div id="roomInfo" class="d-inline-block">
+                            <p class="m-2 d-inline-block">
+                                <img src="./images/person-check-fill.svg" alt="person" />
+                                <span id="readyPlayers">0 / 0</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row justify-content-center">
+                <canvas id="canvas" class="p-0" style="border: 3px solid #333333"></canvas>
+            </div>
+        </div>
+
+        <!-- Modal -->
         <div
             class="modal fade"
             id="modeSelectModal"
@@ -125,32 +153,6 @@
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     </div>
                 </div>
-            </div>
-        </div>
-        <div class="container max-width-200">
-            <div class="text-center">
-                <img src="./images/inkateikoku.png" />
-            </div>
-            <div class="d-flex justify-content-between align-items-end">
-                <p class="m-2">
-                    <img src="./images/house-fill.svg" alt="house" />
-                    <span id="roomId"></span>
-                </p>
-                <div class="m-2">
-                    <button type="button" class="btn btn-primary m-2" id="showResultButton">Start</button>
-                    <button type="button" class="btn btn-secondary m-2" id="resetButton">Reset</button>
-                    <div class="row justify-content-center text-center">
-                        <div id="roomInfo" class="d-inline-block">
-                            <p class="m-2 d-inline-block">
-                                <img src="./images/person-check-fill.svg" alt="person" />
-                                <span id="readyPlayers">0 / 0</span>
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row justify-content-center">
-                <canvas id="canvas" class="p-0" style="border: 3px solid #333333"></canvas>
             </div>
         </div>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>

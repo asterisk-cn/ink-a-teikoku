@@ -78,7 +78,6 @@ class Player extends GameObject {
             this.y = Math.random() * (FIELD_HEIGHT - 100);
         } while (this.intersect(game));
         this.isReady = true;
-        console.log(`Player ${this.name} is ready!`);
     }
 
     reset() {
@@ -305,6 +304,7 @@ io.on("connection", (socket) => {
         const game = rooms[user.roomId];
         game.reset();
         io.in(user.roomId).emit("init", game);
+        io.in(user.roomId).emit("readyPlayers", game.numReadyActualPlayers, game.numActualPlayers);
     });
 
     socket.on("disconnect", () => {
