@@ -121,13 +121,14 @@ class Obstacle extends GameObject {
 }
 
 class Game {
-    constructor() {
+    constructor(roomId) {
         this.players = {};
         this.obstacles = {};
         this.status = {
             winners: [],
             isTie: false,
         };
+        this.roomId = roomId;
 
         this.setRandomObstacles(3);
     }
@@ -217,11 +218,11 @@ class Game {
 
             this.checkWinner();
 
-            io.emit("renderGame", this);
+            io.in(this.roomId).emit("renderGame", this);
 
             // ゲーム終了判定
             if (this.isGameOver) {
-                io.emit("gameOver", this);
+                io.in(this.roomId).emit("gameOver", this);
                 clearInterval(timerId);
             }
         }, 1000 / 60);
@@ -242,7 +243,7 @@ io.on("connection", (socket) => {
         });
 
         if (rooms[player.roomId] === undefined) {
-            rooms[player.roomId] = new Game();
+            rooms[player.roomId] = new Game(player.roomId);
         }
 
         const game = rooms[player.roomId];
