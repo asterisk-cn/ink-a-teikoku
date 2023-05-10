@@ -311,10 +311,6 @@ io.on("connection", (socket) => {
         const isValidate = !player.intersectObstacles(obstacles);
         player.isReady = isValidate;
 
-        if (player.isReady) {
-            console.log(`Player ${player.name} is ready!`);
-        }
-
         socket.emit("renderSelect", game, isValidate);
         io.in(user.roomId).emit("readyPlayers", game.numReadyActualPlayers, game.numActualPlayers);
     });
